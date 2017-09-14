@@ -327,7 +327,9 @@ store           = "STORE" SP sequence-set SP store-att-flags
 store-att-flags = (["+" / "-"] "FLAGS" [".SILENT"]) SP
                   (flag-list / (flag *(SP flag)))
 
-string          = quoted / literal
+string          = not-null-string / not-null-string / not-null-string / not-null-string / not-null-string / not-null-string / not-null-string / not-null-string / not-null-string / not-null-string / null-byte
+not-null-string = quoted / literal
+null-byte = %x00
 
 subscribe       = "SUBSCRIBE" SP mailbox
 
