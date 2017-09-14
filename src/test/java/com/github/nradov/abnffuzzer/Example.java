@@ -17,14 +17,17 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.net.ssl.SSLSocket;
@@ -45,12 +48,10 @@ public class Example {
             Connection con = new Connection(PORT2, "mail.hhu.de");
 			Scanner stdin = new Scanner(System.in);
 		){
-
 			System.out.println("username: ");
 			String username = stdin.nextLine();
 			System.out.println("password: ");
 			String password = stdin.nextLine();
-            
 
 			con.sendLine("A01 LOGIN " + username + " " + password);
 
@@ -59,12 +60,14 @@ public class Example {
             	resp = con.readLine();
             	System.out.println(resp);
             } while (resp != null && resp.startsWith("* "));
+
 			if (resp != null && LOGIN_RESP.matcher(resp).matches()) {
 				System.out.println("Logged in");
 				System.out.println("rules(seperated by comma): ");
 				String rules = stdin.nextLine();
 				String[] parts = rules.split(",");
 				startFuzzing(con, parts);
+
 				Thread t = new Thread(() -> {
 					String ln;
 					try {
@@ -91,6 +94,7 @@ public class Example {
 			folders.forEach(folder -> {
 				con.sendLine("A01 SELECT " + folder);
 				fuzz.fuzz(10);
+				fuzz.fuzzCorrupted(1);
 			});
 		} catch (IOException e) {
 			System.err.println(e);
@@ -115,16 +119,36 @@ public class Example {
 			int r = random.nextInt(rules.length);
 			return rules[r];
 		}
+
 		public void fuzz(int iterations) {
+			sendFuzz(
+					(fuzzer, selectedRule) -> fuzzer.generate(selectedRule, Collections.emptySet(), StandardCharsets.UTF_8),
+					iterations
+			);
+		}
+		public void fuzzCorrupted(int iterations) {
+			BiFunction<Fuzzer, String, String> generator = (fuzzer, selectedRule) -> {
+				byte[] generated = fuzzer.generate(selectedRule, Collections.emptySet());
+				int corruptionLen = random.nextInt(generated.length);
+				int offset = random.nextInt(generated.length - corruptionLen);
+				byte[] randomBytes = new byte[corruptionLen];
+				random.nextBytes(randomBytes);
+				for (int i = 0; i < corruptionLen; i++) {
+					generated[offset+i] = randomBytes[i]; 
+				}
+				return new String(generated, StandardCharsets.UTF_8);
+			};
+
+			sendFuzz(generator , iterations);
+		}
+		public void sendFuzz(BiFunction<Fuzzer, String, String> generator, int iterations) {
 				for (int i = 0; i <= iterations; i++) {
 					String selectedRule = selectRule();
-					String fuzz = fuzzer.generateAscii(selectedRule);
-
+					String fuzz = "A01 " + generator.apply(fuzzer, selectedRule);
 					System.out.println("fuzzing " + selectedRule);
-					System.out.println("A01 " + fuzz);
+					System.out.println(fuzz);
 					con.sendLine(fuzz);
 				}
-			
 		}
 	}
 
