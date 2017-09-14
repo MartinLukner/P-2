@@ -128,7 +128,6 @@ public class Example {
 			for (int i = 0; i < 2147483643; i++) {
 				int idx = random.nextInt(10);
 				char c = digits[idx];
-				//System.out.print(c);
 				con.sendChar(c);
 			}
 		}
