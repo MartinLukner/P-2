@@ -66,8 +66,6 @@ public class Example {
 				System.out.println("rules(seperated by comma): ");
 				String rules = stdin.nextLine();
 				String[] parts = rules.split(",");
-				startFuzzing(con, parts);
-
 				Thread t = new Thread(() -> {
 					String ln;
 					try {
@@ -78,7 +76,10 @@ public class Example {
 						e.printStackTrace();
 					}
 				});
-				t.run();
+				t.start();
+
+				startFuzzing(con, parts);
+
 				t.join();
 			}
 		} catch (Exception e) {
@@ -96,6 +97,7 @@ public class Example {
 				fuzz.fuzz(10);
 				fuzz.fuzzCorrupted(1);
 			});
+			fuzz.fetchGigantic(con);
 		} catch (IOException e) {
 			System.err.println(e);
 		}
@@ -120,6 +122,16 @@ public class Example {
 			return rules[r];
 		}
 
+		public void fetchGigantic(Connection con) {
+			con.sendString("A01 FETCH ");
+			char[] digits = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+			for (int i = 0; i < 2147483643; i++) {
+				int idx = random.nextInt(10);
+				char c = digits[idx];
+				//System.out.print(c);
+				con.sendChar(c);
+			}
+		}
 		public void fuzz(int iterations) {
 			sendFuzz(
 					(fuzzer, selectedRule) -> fuzzer.generate(selectedRule, Collections.emptySet(), StandardCharsets.UTF_8),
@@ -176,6 +188,12 @@ public class Example {
             socket.close();
             reader.close();
             writer.close();
+        }
+        public void sendChar(char c) {
+			writer.print(c);
+        }
+        public void sendString(String str) {
+			writer.print(str);
         }
         public void sendLine(String line) {
 			writer.println(line);
