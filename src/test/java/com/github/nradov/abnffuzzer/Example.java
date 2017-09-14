@@ -6,6 +6,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,7 +16,10 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -38,7 +42,7 @@ public class Example {
 
 	@Test
 	public void testMyMethod() throws IOException {
-		File file = new File("C:\\Users\\marti\\Desktop\\pü\\abnffuzzer\\src\\test\\resources\\Untitled 1");
+		File file = new File("C:\\Users\\marti\\Desktop\\pü\\abnffuzzer\\src\\test\\resources\\grammar");
 		fuzzer = new Fuzzer(file);
 		InetAddress ipAddress = null;
 		try {
@@ -50,9 +54,7 @@ public class Example {
 
 			ipAddress = InetAddress.getByName("mail.hhu.de");
 			Socket s = new Socket(ipAddress, PORT2);
-			SSLSocket socket = (SSLSocket) ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(
-			        s,
-			        s.getInetAddress().getHostAddress(), s.getPort(), true);			
+			SSLSocket socket = (SSLSocket) ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(s, s.getInetAddress().getHostAddress(), s.getPort(), true);			
 			in = socket.getInputStream();
 			bin = new BufferedInputStream(in);
 			reader = new BufferedReader(new InputStreamReader(bin));
@@ -85,8 +87,7 @@ public class Example {
 			System.out.println("rules(seperated by comma): ");
 			rules = scanner.nextLine();
 			writer.println("A01 LOGIN " + username + " " + password);
-			writer.flush();
-			//startFuzzing(rules);
+			writer.flush();	
 			t.join();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -95,14 +96,28 @@ public class Example {
 
 	private void startFuzzing(String rules) {
 		String[] parts = rules.split(",");
-		for (String str : parts) {
-			for (int i = 0; i <= 9; i++) {
-				System.out.println("fuzzing " + str);
-				String fuzz = fuzzer.generateAscii(str);
-				System.out.println(fuzz);
-				writer.println(fuzz);
-				writer.flush();
+		Random random = new Random();
+		File file = new File("C:\\Users\\marti\\Desktop\\pü\\abnffuzzer\\src\\test\\resources\\folders");
+		ArrayList<String> folders = new ArrayList<String>();
+		try {
+			Scanner scanner = new Scanner(file);
+			while (scanner.hasNextLine()) {
+				folders.add(scanner.nextLine());
 			}
+			for (int k = 0; k < folders.size(); k++) {
+				writer.println("SELECT " + folders.get(k));
+				writer.flush();
+				for (int i = 0; i <= 10; i++) {
+					int r = random.nextInt(parts.length);
+					System.out.println("fuzzing " + parts[r]);
+					String fuzz = fuzzer.generateAscii(parts[r]);
+					System.out.println(fuzz);
+					writer.println(fuzz);
+					writer.flush();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 }
