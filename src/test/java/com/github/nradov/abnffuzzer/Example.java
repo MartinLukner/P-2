@@ -68,7 +68,7 @@ public class Example {
 						try {
 							String str;
 							while ((str = reader.readLine()) != null) {
-								System.out.println("Answer: " + str);
+								System.out.println("Answer: ...");
 								if(str.equals("A01 OK [CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY "
 										+ "THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT "
 										+ "CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES "
@@ -105,14 +105,15 @@ public class Example {
 				folders.add(scanner.nextLine());
 			}
 			for (int k = 0; k < folders.size(); k++) {
-				writer.println("SELECT " + folders.get(k));
+				System.out.println("------------new folder---------------");
+				writer.println("A01 select " + folders.get(k));
 				writer.flush();
-				for (int i = 0; i <= 10; i++) {
+				for (int i = 0; i <= 5; i++) {
 					int r = random.nextInt(parts.length);
 					System.out.println("fuzzing " + parts[r]);
 					String fuzz = fuzzer.generateAscii(parts[r]);
 					System.out.println(fuzz);
-					writer.println(fuzz);
+					writer.println("A01 " + fuzz);
 					writer.flush();
 				}
 			}
