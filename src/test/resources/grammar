@@ -148,8 +148,13 @@ env-to          = "(" 1*address ")" / nil
 
 examine         = "EXAMINE" SP mailbox
 
-fetch           = "FETCH" SP sequence-set SP ("ALL" / "FULL" / "FAST" /
-                  fetch-att / "(" fetch-att *(SP fetch-att) ")")
+fetch           = "FETCH" SP sequence-set SP ("ALL" / "FULL" / "FAST" / fetch-att / "(" fetch-att *(SP fetch-att) ")")
+                / "FETCH" SP sequence-set SP ("ALL" / "FULL" / "FAST" / fetch-att / "(" fetch-att *(SP fetch-att) ")")
+                / "FETCH" SP sequence-set SP ("ALL" / "FULL" / "FAST" / fetch-att / "(" fetch-att *(SP fetch-att) ")")
+                / "FETCH" SP sequence-set SP ("ALL" / "FULL" / "FAST" / fetch-att / "(" fetch-att *(SP fetch-att) ")")
+                / "FETCH" SP sequence-set SP ("ALL" / "FULL" / "FAST" / fetch-att / "(" fetch-att *(SP fetch-att) ")")
+                / "FETCH" SP sequence-set SP ("ALL" / "FULL" / "FAST" / fetch-att / "(" fetch-att *(SP fetch-att) ")")
+                / "FETCH" SP sequence-set SP ("ALL" / "FULL" / "FAST" / fetch-att / "(" fetch-att *(SP fetch-att) ")") SP ("ALL" / "FULL" / "FAST" / fetch-att / "(" fetch-att *(SP fetch-att) ")")
 
 fetch-att       = "ENVELOPE" / "FLAGS" / "INTERNALDATE" /
                   "RFC822" [".HEADER" / ".SIZE" / ".TEXT"] /
@@ -214,7 +219,7 @@ media-message   = DQUOTE "MESSAGE" DQUOTE SP DQUOTE "RFC822" DQUOTE
 
 media-subtype   = string
 
-media-text      = DQUOTE "TEXT" DQUOTE SP media-subtype
+media-text      = DQUOTE "TEXT" DQUOTE SP media-subtype 
 
 message-data    = nz-number SP ("EXPUNGE" / ("FETCH" SP msg-att))
 
@@ -233,7 +238,7 @@ nil             = "NIL"
 
 nstring         = string / nil
 
-number          = 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT /  "-" 1*DIGIT
+number          = 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT /  "-" 1*DIGIT / string
 
 nz-number       = digit-nz *DIGIT
 
