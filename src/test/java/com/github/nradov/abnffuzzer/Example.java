@@ -85,9 +85,9 @@ public class Example {
 
 	private void startFuzzing(Connection con, String[] rules) {
 		try (
-			Fuzz fuzz = new Fuzz(con, "src\\test\\resources\\grammar", rules);
 			Stream<String> folders = Files.lines(Paths.get("src\\test\\resources\\folders"))
 		){
+			Fuzz fuzz = new Fuzz(con, "src\\test\\resources\\grammar", rules);
 			folders.forEach(folder -> {
 				con.sendLine("A01 SELECT " + folder);
 				fuzz.fuzz(10);
@@ -97,7 +97,7 @@ public class Example {
 		}
 	}
 	
-	private static class Fuzz implements Closeable{
+	private static class Fuzz {
 		private Random random;
 		private Fuzzer fuzzer;
 		private String[] rules;
@@ -121,15 +121,11 @@ public class Example {
 					String fuzz = fuzzer.generateAscii(selectedRule);
 
 					System.out.println("fuzzing " + selectedRule);
-					System.out.println(fuzz);
+					System.out.println("A01 " + fuzz);
 					con.sendLine(fuzz);
 				}
 			
 		}
-		public void close() throws IOException{
-			con.close();
-		}
-
 	}
 
     private static class Connection implements Closeable {
