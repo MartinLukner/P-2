@@ -42,7 +42,7 @@ public class Example {
 
 	@Test
 	public void testMyMethod() throws IOException {
-		File file = new File("C:\\Users\\marti\\Desktop\\pü\\abnffuzzer\\src\\test\\resources\\grammar");
+		File file = new File("src\\test\\resources\\grammar");
 		fuzzer = new Fuzzer(file);
 		InetAddress ipAddress = null;
 		try {

@@ -1,3 +1,6 @@
 /target/
 /pom.xml.releaseBackup
 /release.properties
+.idea/
+abnffuzzer.iml
+mail-1.4.7.jar
