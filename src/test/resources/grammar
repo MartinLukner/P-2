@@ -233,7 +233,7 @@ nil             = "NIL"
 
 nstring         = string / nil
 
-number          = 1*DIGIT
+number          = 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT / 1*DIGIT /  "-" 1*DIGIT
 
 nz-number       = digit-nz *DIGIT
 
